@@ -12,6 +12,7 @@ using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace DevCars.API
@@ -35,7 +36,16 @@ namespace DevCars.API
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "DevCars.API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo 
+                {   
+                    Title = "DevCars.API", 
+                    Version = "v1",
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Gabriel Caires",
+                        Email = "gbrlcaires@gmail.com"
+                    }
+                });
             });
         }
 

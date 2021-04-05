@@ -1,10 +1,13 @@
-﻿using DevCars.API.Entities;
+﻿using Dapper;
+using DevCars.API.Entities;
 using DevCars.API.InputModels;
 using DevCars.API.Persistence;
 using DevCars.API.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,21 +17,31 @@ namespace DevCars.API.Controllers
     public class CarsController : ControllerBase
     {
         private readonly DevCarsDbContext _dbContext;
-        public CarsController(DevCarsDbContext dbContext)
+        private readonly string _connectionString;
+
+        public CarsController(DevCarsDbContext dbContext, IConfiguration configurarion)
         {
             _dbContext = dbContext;
+            _connectionString = configurarion.GetConnectionString("DevCarscs");
         }
 
         // GET api/cars
         [HttpGet]
         public IActionResult Get()
         {
-            // Retorna lista de CarItemViewModel
+            //Retorna lista de CarItemViewModel
             var cars = _dbContext.Cars;
 
             var carsViewModel = cars
                 .Select(c => new CarItemViewModel(c.Id, c.Brand, c.Model, c.Price))
                 .ToList();
+
+            //using (var sqlConnection = new SqlConnection(_connectionString))
+            //{
+            //    var query = "SELECT ID, BRAND, MODEL, PRICE FROM CARS WHERE STATUS = 0";
+
+            //    var carsViewModel = sqlConnection.Query<CarItemViewModel>(query);
+            //}
 
             return Ok(carsViewModel);
         }
@@ -104,6 +117,13 @@ namespace DevCars.API.Controllers
 
             car.Update(model.Color, model.Price);
             _dbContext.SaveChanges();
+
+            //using (var sqlConnection = new SqlConnection(_connectionString))
+            //{
+            //    var query = "UPDATE CARS SET COLOR = @color, PRICE = @price WHERE ID = @id";
+
+            //    sqlConnection.Execute(query, new { color = car.Color, price = car.Price, id = car.Id });
+            //}
 
             return NoContent();
         }
